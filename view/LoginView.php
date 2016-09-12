@@ -21,7 +21,13 @@ class LoginView {
 	 */
 	public function response() {
 		$message = '';
-		$message = $this->credentialChecker();
+
+		$this->credentialChecker();
+
+		if (isset($_SESSION["message"])) {
+			$message = $_SESSION["message"];
+		}
+
 		$response = $this->generateLoginFormHTML($message);
 		//$response .= $this->generateLogoutButtonHTML($message);
 		return $response;
@@ -85,7 +91,11 @@ class LoginView {
 	}
 
 	public function isLoggedIn() {
-		$status = $this->compareDatabase()[1];
+		$status = false;
+
+		if (isset($_SESSION["loggedIn"])) {
+			$status = $_SESSION["loggedIn"];
+		}
 		return $status;
 	}
 
@@ -114,43 +124,37 @@ class LoginView {
 	}
 
 	private function compareDatabase() {
-		$text = array();
 
 		if (isset($_POST[self::$login])) {
 			$username = $_POST[self::$name];
 			$password = $_POST[self::$password];
 
 			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
-				$text[] = "Welcome";
-				$text[] = true;
+				$_SESSION["loggedIn"] = true;
+				$_SESSION["message"] = "Welcome";
 			} else {
-				$text[] = "Wrong name or password";
-				$text[] = false;
+				$_SESSION["message"] = "Wrong name or password";
 			}
 
-		} else {
-			$text[] = "";
-			$text[] = false;
 		}
 
-		return $text;
-
+		return;
 	}
 
 	private function credentialChecker() {
-		$loginMessage = "";
 
 		if (isset($_POST[self::$login])) {
 			if ($this->checkUsername() && $this->checkPassword()) {
-				$loginMessage = $this->compareDatabase()[0];
+				$this->compareDatabase();
 			} else if (!$this->checkUsername()) {
-				$loginMessage = "Username is missing";
+				$_SESSION["message"] = "Username is missing";
 			} else if (!$this->checkPassword()) {
-				$loginMessage = "Password is missing";
+				$_SESSION["message"] = "Password is missing";
 			}
 		}
 
-		return $loginMessage;
+		return;
+
 	}
 
 }
