@@ -69,6 +69,11 @@ class LoginView {
 		';
 	}
 
+	private function superRealDatabase() {
+		$credentials = array("username" => "Admin", "password" => "Password");
+		return $credentials;
+	}
+
 	private function getRequestUserName() {
 		$username = "";
 
@@ -103,11 +108,28 @@ class LoginView {
 		return $hasPassword;
 	}
 
+	private function compareDatabase() {
+		$username = $_POST[self::$name];
+		$password = $_POST[self::$password];
+		$text = "";
+
+		if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
+			$text = "";
+		} else {
+			$text = "Wrong name or password";
+		}
+
+		return $text;
+
+	}
+
 	private function credentialChecker() {
 		$loginMessage = "";
 
 		if (isset($_POST[self::$login])) {
-			if (!$this->checkUsername()) {
+			if ($this->checkUsername() && $this->checkPassword()) {
+				$loginMessage = $this->compareDatabase();
+			} else if (!$this->checkUsername()) {
 				$loginMessage = "Username is missing";
 			} else if (!$this->checkPassword()) {
 				$loginMessage = "Password is missing";
