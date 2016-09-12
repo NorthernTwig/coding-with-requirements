@@ -121,7 +121,7 @@ class LoginView {
 			$password = $_POST[self::$password];
 
 			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
-				$text[] = "";
+				$text[] = "Welcome";
 				$text[] = true;
 			} else {
 				$text[] = "Wrong name or password";
