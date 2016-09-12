@@ -10,7 +10,7 @@ class LoginView {
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
-	
+
 
 	/**
 	 * Create HTTP response
@@ -21,11 +21,12 @@ class LoginView {
 	 */
 	public function response() {
 		$message = '';
-		
+		$message = $this->credentialChecker();
 		$response = $this->generateLoginFormHTML($message);
 		//$response .= $this->generateLogoutButtonHTML($message);
 		return $response;
 	}
+
 
 	/**
 	* Generate HTML code on the output buffer for the logout button
@@ -40,7 +41,7 @@ class LoginView {
 			</form>
 		';
 	}
-	
+
 	/**
 	* Generate HTML code on the output buffer for the logout button
 	* @param $message, String output message
@@ -48,11 +49,11 @@ class LoginView {
 	*/
 	private function generateLoginFormHTML($message) {
 		return '
-			<form method="post" > 
+			<form method="post" >
 				<fieldset>
 					<legend>Login - enter Username and password</legend>
 					<p id="' . self::$messageId . '">' . $message . '</p>
-					
+
 					<label for="' . self::$name . '">Username :</label>
 					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="" />
 
@@ -61,16 +62,59 @@ class LoginView {
 
 					<label for="' . self::$keep . '">Keep me logged in  :</label>
 					<input type="checkbox" id="' . self::$keep . '" name="' . self::$keep . '" />
-					
+
 					<input type="submit" name="' . self::$login . '" value="login" />
 				</fieldset>
 			</form>
 		';
 	}
-	
-	//CREATE GET-FUNCTIONS TO FETCH REQUEST VARIABLES
+
 	private function getRequestUserName() {
-		//RETURN REQUEST VARIABLE: USERNAME
+		$username = "";
+
+		if (isset($_POST[self::$name])) {
+			$username = $_POST[self::$name];
+		}
+
+		return $username;
 	}
-	
+
+	private function checkUsername() {
+		$hasUsername = false;
+
+		if (isset($_POST[self::$name])) {
+			if (strlen($_POST[self::$name])) {
+				$hasUsername = true;
+			}
+		}
+
+		return $hasUsername;
+	}
+
+	private function checkPassword() {
+		$hasPassword = false;
+
+		if (isset($_POST[self::$password])) {
+			if (strlen($_POST[self::$password])) {
+				$hasPassword = true;
+			}
+		}
+
+		return $hasPassword;
+	}
+
+	private function credentialChecker() {
+		$loginMessage = "";
+
+		if (isset($_POST[self::$login])) {
+			if (!$this->checkUsername()) {
+				$loginMessage = "Username is missing";
+			} else if (!$this->checkPassword()) {
+				$loginMessage = "Password is missing";
+			}
+		}
+
+		return $loginMessage;
+	}
+
 }
