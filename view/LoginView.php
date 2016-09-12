@@ -84,6 +84,11 @@ class LoginView {
 		return $username;
 	}
 
+	public function isLoggedIn() {
+		$status = $this->compareDatabase()[1];
+		return $status;
+	}
+
 	private function checkUsername() {
 		$hasUsername = false;
 
@@ -109,14 +114,23 @@ class LoginView {
 	}
 
 	private function compareDatabase() {
-		$username = $_POST[self::$name];
-		$password = $_POST[self::$password];
-		$text = "";
+		$text = array();
 
-		if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
-			$text = "";
+		if (isset($_POST[self::$login])) {
+			$username = $_POST[self::$name];
+			$password = $_POST[self::$password];
+
+			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
+				$text[] = "";
+				$text[] = true;
+			} else {
+				$text[] = "Wrong name or password";
+				$text[] = false;
+			}
+
 		} else {
-			$text = "Wrong name or password";
+			$text[] = "";
+			$text[] = false;
 		}
 
 		return $text;
@@ -128,7 +142,7 @@ class LoginView {
 
 		if (isset($_POST[self::$login])) {
 			if ($this->checkUsername() && $this->checkPassword()) {
-				$loginMessage = $this->compareDatabase();
+				$loginMessage = $this->compareDatabase()[0];
 			} else if (!$this->checkUsername()) {
 				$loginMessage = "Username is missing";
 			} else if (!$this->checkPassword()) {
