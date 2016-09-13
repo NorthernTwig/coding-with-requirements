@@ -11,7 +11,6 @@ class LoginView {
 	private static $messageId = 'LoginView::Message';
 
 
-
 	/**
 	 * Create HTTP response
 	 *
@@ -22,16 +21,20 @@ class LoginView {
 	public function response() {
 		$message = '';
 
+		$_SESSION["message"] = "";
+
 		$this->credentialChecker();
 
 		if (isset($_SESSION["message"])) {
 			$message = $_SESSION["message"];
 		}
 
+
 		$response = $this->generateLoginFormHTML($message);
 		//$response .= $this->generateLogoutButtonHTML($message);
 		return $response;
 	}
+
 
 
 	/**
@@ -88,16 +91,10 @@ class LoginView {
 		}
 
 		return $username;
+
 	}
 
-	public function isLoggedIn() {
-		$status = false;
 
-		if (isset($_SESSION["loggedIn"])) {
-			$status = $_SESSION["loggedIn"];
-		}
-		return $status;
-	}
 
 	private function checkUsername() {
 		$hasUsername = false;
@@ -123,9 +120,23 @@ class LoginView {
 		return $hasPassword;
 	}
 
-	private function compareDatabase() {
+	public function isLoggedIn() {
+		$status = false;
 
-		if (isset($_POST[self::$login])) {
+		if (isset($_POST[self::$name]) && isset($_POST[self::$password])) {
+			$this->compareDatabase();
+		}
+
+		if (isset($_SESSION["loggedIn"])) {
+			$status = $_SESSION["loggedIn"];
+		}
+
+		return $status;
+
+	}
+
+	public function compareDatabase() {
+
 			$username = $_POST[self::$name];
 			$password = $_POST[self::$password];
 
@@ -136,7 +147,6 @@ class LoginView {
 				$_SESSION["message"] = "Wrong name or password";
 			}
 
-		}
 
 		return;
 	}
