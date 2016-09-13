@@ -94,8 +94,6 @@ class LoginView {
 
 	}
 
-
-
 	private function checkUsername() {
 		$hasUsername = false;
 
@@ -147,13 +145,14 @@ class LoginView {
 				$_SESSION["message"] = "Wrong name or password";
 			}
 
-
 		return;
+
 	}
 
 	private function credentialChecker() {
 
 		if (isset($_POST[self::$login])) {
+			header("Location: /index.php", true, 302);
 			if ($this->checkUsername() && $this->checkPassword()) {
 				$this->compareDatabase();
 			} else if (!$this->checkUsername()) {
