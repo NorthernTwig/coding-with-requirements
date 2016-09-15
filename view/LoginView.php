@@ -31,7 +31,9 @@ class LoginView {
 
 
 		$response = $this->generateLoginFormHTML($message);
-		//$response .= $this->generateLogoutButtonHTML($message);
+		if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"] == true) {
+			$response = $this->generateLogoutButtonHTML($message);
+		}
 		return $response;
 	}
 
@@ -138,12 +140,12 @@ class LoginView {
 			$username = $_POST[self::$name];
 			$password = $_POST[self::$password];
 
-			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
-				$_SESSION["loggedIn"] = true;
-				$_SESSION["message"] = "Welcome";
-			} else {
-				$_SESSION["message"] = "Wrong name or password";
-			}
+				if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
+					$_SESSION["loggedIn"] = true;
+					$_SESSION["message"] = "Welcome";
+				} else {
+					$_SESSION["message"] = "Wrong name or password";
+				}
 
 		return;
 
@@ -151,8 +153,12 @@ class LoginView {
 
 	private function credentialChecker() {
 
-		if (isset($_POST[self::$login])) {
-			header("Location: /index.php", true, 302);
+		if (isset($_POST[self::$logout])) {
+			$_SESSION["loggedIn"] = false;
+			$_SESSION["message"] = "Bye bye!";
+		}
+
+		if (isset($_POST[self::$login]) && !isset($_POST[self::$logout])) {
 			if ($this->checkUsername() && $this->checkPassword()) {
 				$this->compareDatabase();
 			} else if (!$this->checkUsername()) {
