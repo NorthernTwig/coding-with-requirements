@@ -131,6 +131,10 @@ class LoginView {
 			$status = $_SESSION["loggedIn"];
 		}
 
+		if (isset($_POST[self::$logout])) {
+			$status = false;
+		}
+
 		return $status;
 
 	}
