@@ -9,6 +9,7 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
+	private static $message = 'LoginView::testing';
 	private static $hasAlreadyLoggedIn = 'LoginView::Test';
 
 
@@ -21,16 +22,16 @@ class LoginView {
 	 */
 	public function response($sessionBefore) {
 
-		self::$messageId = "";
+		self::$message = "";
 
 		self::$hasAlreadyLoggedIn = $sessionBefore;
 
 		$this->credentialChecker();
 
-		$response = $this->generateLoginFormHTML(self::$messageId);
+		$response = $this->generateLoginFormHTML(self::$message);
 		if (isset($_SESSION["loggedIn"])) {
 			if ($_SESSION["loggedIn"]) {
-				$response = $this->generateLogoutButtonHTML(self::$messageId);
+				$response = $this->generateLogoutButtonHTML(self::$message);
 			}
 		}
 
@@ -47,7 +48,7 @@ class LoginView {
 	private function generateLogoutButtonHTML($message) {
 		return '
 			<form  method="post" >
-				<p id="' . self::$messageId . '">' . $message .'</p>
+				<p id="' . self::$message . '">' . $message .'</p>
 				<input type="submit" name="' . self::$logout . '" value="logout"/>
 			</form>
 		';
@@ -63,7 +64,7 @@ class LoginView {
 			<form method="post" >
 				<fieldset>
 					<legend>Login - enter Username and password</legend>
-					<p id="' . self::$messageId . '">' . $message . '</p>
+					<p id="' . self::$message . '">' . $message . '</p>
 
 					<label for="' . self::$name . '">Username :</label>
 					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->getRequestUserName() . '" />
@@ -155,11 +156,11 @@ class LoginView {
 
 			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
 					if (!self::$hasAlreadyLoggedIn) {
-						self::$messageId = "Welcome";
+						self::$message = "Welcome";
 					}
 					$_SESSION["loggedIn"] = true;
 				} else {
-					self::$messageId = "Wrong name or password";
+					self::$message = "Wrong name or password";
 				}
 
 	}
@@ -169,7 +170,7 @@ class LoginView {
   		if (isset($_POST[self::$logout])) {
           	$_SESSION["loggedIn"] = false;
 						if (self::$hasAlreadyLoggedIn) {
-							self::$messageId = "Bye bye!";
+							self::$message = "Bye bye!";
 						}
   		}
 
@@ -177,9 +178,9 @@ class LoginView {
           	if ($this->checkUsername() && $this->checkPassword()) {
             	$this->compareDatabase();
           	} else if (!$this->checkUsername()) {
-            	self::$messageId = "Username is missing";
+            	self::$message = "Username is missing";
           	} else if (!$this->checkPassword()) {
-            	self::$messageId = "Password is missing";
+            	self::$message = "Password is missing";
           	}
   			}
 
