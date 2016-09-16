@@ -64,7 +64,7 @@ class LoginView {
 			<form method="post" >
 				<fieldset>
 					<legend>Login - enter Username and password</legend>
-					<p id="' . self::$message . '">' . $message . '</p>
+					<p id="' . self::$messageId . '">' . $message . '</p>
 
 					<label for="' . self::$name . '">Username :</label>
 					<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="' . $this->getRequestUserName() . '" />
