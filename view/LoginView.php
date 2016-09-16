@@ -9,6 +9,7 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
+	private static $hasAlreadyLoggedIn = 'LoginView::Test';
 
 
 	/**
@@ -18,25 +19,24 @@ class LoginView {
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
-	public function response() {
-		$message = '';
+	public function response($sessionBefore) {
 
-		$_SESSION["message"] = "";
+		self::$messageId = "";
+
+		self::$hasAlreadyLoggedIn = $sessionBefore;
 
 		$this->credentialChecker();
 
-		if (isset($_SESSION["message"])) {
-			$message = $_SESSION["message"];
+		$response = $this->generateLoginFormHTML(self::$messageId);
+		if (isset($_SESSION["loggedIn"])) {
+			if ($_SESSION["loggedIn"]) {
+				$response = $this->generateLogoutButtonHTML(self::$messageId);
+			}
 		}
 
-
-		$response = $this->generateLoginFormHTML($message);
-		if (isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"] == true) {
-			$response = $this->generateLogoutButtonHTML($message);
-		}
 		return $response;
-	}
 
+	}
 
 
 	/**
@@ -96,6 +96,14 @@ class LoginView {
 
 	}
 
+	public function getThings() {
+		$loggedBefore = false;
+		if (isset($_SESSION["loggedIn"])) {
+			$loggedBefore = $_SESSION["loggedIn"];
+		}
+		return $loggedBefore;
+	}
+
 	private function checkUsername() {
 		$hasUsername = false;
 
@@ -112,12 +120,13 @@ class LoginView {
 		$hasPassword = false;
 
 		if (isset($_POST[self::$password])) {
-			if (strlen($_POST[self::$password])) {
+			if (strlen($_POST[self::$password]) > 0) {
 				$hasPassword = true;
 			}
 		}
 
 		return $hasPassword;
+
 	}
 
 	public function isLoggedIn() {
@@ -144,35 +153,37 @@ class LoginView {
 			$username = $_POST[self::$name];
 			$password = $_POST[self::$password];
 
-				if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
+			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
+					if (!self::$hasAlreadyLoggedIn) {
+						self::$messageId = "Welcome";
+					}
 					$_SESSION["loggedIn"] = true;
-					$_SESSION["message"] = "Welcome";
 				} else {
-					$_SESSION["message"] = "Wrong name or password";
+					self::$messageId = "Wrong name or password";
 				}
-
-		return;
 
 	}
 
 	private function credentialChecker() {
 
-		if (isset($_POST[self::$logout])) {
-			$_SESSION["loggedIn"] = false;
-			$_SESSION["message"] = "Bye bye!";
-		}
+  		if (isset($_POST[self::$logout])) {
+          	$_SESSION["loggedIn"] = false;
+						if (self::$hasAlreadyLoggedIn) {
+							self::$messageId = "Bye bye!";
+						}
+  		}
 
-		if (isset($_POST[self::$login]) && !isset($_POST[self::$logout])) {
-			if ($this->checkUsername() && $this->checkPassword()) {
-				$this->compareDatabase();
-			} else if (!$this->checkUsername()) {
-				$_SESSION["message"] = "Username is missing";
-			} else if (!$this->checkPassword()) {
-				$_SESSION["message"] = "Password is missing";
-			}
-		}
+  		if (isset($_POST[self::$login])) {
+          	if ($this->checkUsername() && $this->checkPassword()) {
+            	$this->compareDatabase();
+          	} else if (!$this->checkUsername()) {
+            	self::$messageId = "Username is missing";
+          	} else if (!$this->checkPassword()) {
+            	self::$messageId = "Password is missing";
+          	}
+  			}
 
-		return;
+  		return;
 
 	}
 

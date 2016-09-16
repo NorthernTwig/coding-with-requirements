@@ -16,4 +16,6 @@ $v = new LoginView();
 $dtv = new DateTimeView();
 $lv = new LayoutView();
 
-$lv->render($v->isLoggedIn(), $v, $dtv);
+$sessionBefore = $v->getThings();
+
+$lv->render($v->isLoggedIn(), $v, $dtv, $sessionBefore);
