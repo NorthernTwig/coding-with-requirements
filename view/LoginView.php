@@ -133,10 +133,10 @@ class LoginView {
 	public function isLoggedIn() {
 		$status = false;
 
-		setcookie("thisIsATestCookie","42",time()+3600);
-
-		if (isset($_POST[self::$name]) && isset($_POST[self::$password])) {
-			$this->compareDatabase();
+		if (isset($_COOKIE["Username"]) && isset($_COOKIE["Password"])) {
+			$this->compareDatabase(true);
+		} else if (isset($_POST[self::$name]) && isset($_POST[self::$password])) {
+			$this->compareDatabase(false);
 		}
 
 		if (isset($_SESSION["loggedIn"])) {
@@ -151,15 +151,38 @@ class LoginView {
 
 	}
 
-	public function compareDatabase() {
+	private function setCookie($username, $password) {
+		setcookie("Username", $username, time()+36000);
+		setcookie("Password", $password, time()+36000);
+	}
 
+	private function unsetCookie() {
+		setcookie("Username", NULL, time()-1);
+		setcookie("Password", NULL, time()-1);
+	}
+
+	public function compareDatabase($isFromCookies) {
+
+		if ($isFromCookies) {
+			$username = $_COOKIE["Username"];
+			$password = $_COOKIE["Password"];
+		} else {
 			$username = $_POST[self::$name];
 			$password = $_POST[self::$password];
+		}
 
 			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
+
 					if (!self::$hasAlreadyLoggedIn) {
+
+						if (isset($_POST[self::$keep]) && $_POST[self::$keep] == "on") {
+							$this->setCookie($username, $password);
+						}
+
 						self::$message = "Welcome";
+
 					}
+
 					$_SESSION["loggedIn"] = true;
 				} else {
 					self::$message = "Wrong name or password";
@@ -172,13 +195,14 @@ class LoginView {
   		if (isset($_POST[self::$logout])) {
           	$_SESSION["loggedIn"] = false;
 						if (self::$hasAlreadyLoggedIn) {
+							$this->unsetCookie();
 							self::$message = "Bye bye!";
 						}
   		}
 
   		if (isset($_POST[self::$login])) {
           	if ($this->checkUsername() && $this->checkPassword()) {
-            	$this->compareDatabase();
+            	$this->compareDatabase(false);
           	} else if (!$this->checkUsername()) {
             	self::$message = "Username is missing";
           	} else if (!$this->checkPassword()) {
