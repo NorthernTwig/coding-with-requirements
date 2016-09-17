@@ -179,7 +179,12 @@ class LoginView {
 							$this->setCookie($username, $password);
 						}
 
-						self::$message = "Welcome";
+						if ($isFromCookies) {
+							self::$message = "Welcome back with cookie";
+						} else {
+							self::$message = "Welcome";
+						}
+
 
 					}
 
