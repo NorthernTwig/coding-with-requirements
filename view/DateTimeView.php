@@ -6,7 +6,7 @@ class DateTimeView {
 		$day = date("l");
 		$date = date("jS");
 		$month = date("F");
-		$year = date("Y");
+		$year = date("h");
 		$time = date("h:i:s");
 
 		$timeString = $day . ", the " . $date . " of " . $month . " " . $year . ", The time is " . $time;

@@ -133,6 +133,8 @@ class LoginView {
 	public function isLoggedIn() {
 		$status = false;
 
+		setcookie("thisIsATestCookie","42",time()+3600);
+
 		if (isset($_POST[self::$name]) && isset($_POST[self::$password])) {
 			$this->compareDatabase();
 		}
