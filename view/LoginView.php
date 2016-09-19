@@ -199,7 +199,9 @@ class LoginView {
 						$this->setCookie($username, $password);
 					}
 
-					if (self::$keep) {
+
+
+					if (self::$keep == "on") {
 						self::$message = "Welcome and you will be remembered";
 					} else {
 						self::$message = "Welcome";
