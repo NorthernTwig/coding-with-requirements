@@ -104,12 +104,15 @@ class LoginView {
 	}
 
 	public function checkCookies() {
+
 		$hasTheRightCookies = false;
 
 		if (isset($_COOKIE["Username"]) && isset($_COOKIE["Password"])) {
 			$hasTheRightCookies = true;
 		}
+
 		return $hasTheRightCookies;
+
 	}
 
 	private function checkUsername() {

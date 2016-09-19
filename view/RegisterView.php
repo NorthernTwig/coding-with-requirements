@@ -5,12 +5,25 @@ class RegisterView {
 	private static $name = 'RegisterView::UserName';
 	private static $password = 'RegisterView::Password';
 	private static $passwordRepeat = 'RegisterView::PasswordRepeat';
+	private static $message = '';
 
 	public function response() {
+
+		if (isset($_POST["DoRegistration"])) {
+			$this->setMessage();
+		}
+
+		$response = $this->generateRegisterForm(self::$message);
+
+		return $response;
+
+	}
+
+	private function generateRegisterForm($message) {
 		return '<form action="?register" method="post" enctype="multipart/form-data">
 							<fieldset>
 							<legend>Register a new user - Write username and password</legend>
-								<p id="' . self::$messageId . '"></p>
+								<p id="' . self::$messageId . '">' . $message . '</p>
 								<label for="' . self::$name . '">Username :</label>
 								<input type="text" size="20" name="' . self::$name . '" id="' . self::$name . '" value="">
 								<br>
@@ -25,5 +38,55 @@ class RegisterView {
 							</fieldset>
 						</form>';
 	}
+
+	private function setMessage() {
+
+		if (!$this->usernameCheck()) {
+			self::$message = 'Username has too few characters, at least 3 characters.<br>';
+		}
+
+
+		if (!$this->passwordCheck()) {
+			self::$message .= 'Password has too few characters, at least 6 characters.<br>';
+		}
+
+		if (!$this->passwordMatch()) {
+			self::$message .= 'Passwords do not match.';
+		}
+
+	}
+
+	private function passwordCheck() {
+		$validPassword = false;
+		if (isset($_POST[self::$password])) {
+			if (strlen($_POST[self::$password]) >= 6) {
+				$validPassword = true;
+			}
+		}
+		return $validPassword;
+	}
+
+	private function usernameCheck() {
+		$validUsername = false;
+
+		if (isset($_POST[self::$name])) {
+			if (strlen($_POST[self::$name]) >= 3) {
+				$validUsername = true;
+			}
+		}
+
+		return $validUsername;
+	}
+
+	private function passwordMatch() {
+		$matching = false;
+		if (isset($_POST[self::$password]) && isset($_POST[self::$passwordRepeat])) {
+			if ($_POST[self::$password] == $_POST[self::$passwordRepeat]) {
+				$matching = true;
+			}
+		}
+		return $matching;
+	}
+
 
 }
