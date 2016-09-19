@@ -159,8 +159,8 @@ class LoginView {
 	}
 
 	private function setCookie($username, $password) {
-		setcookie("Username", $username, time()+36000);
-		setcookie("Password", $password, time()+36000);
+		setcookie("Username", $username, time()+36000, NULL, NULL, NULL, true);
+		setcookie("Password", $password, time()+36000, NULL, NULL, NULL, true);
 	}
 
 	private function unsetCookie() {
