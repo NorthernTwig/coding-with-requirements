@@ -209,7 +209,7 @@ class LoginView {
 
 	private function credentialChecker() {
 
-  		if (isset($_POST[self::$logout])) {
+  		if (isset($_POST[self::$logout]) || isset($_POST[self::$cookieName])) {
           	$_SESSION["loggedIn"] = false;
 						if (self::$hasAlreadyLoggedIn) {
 							$this->unsetCookie();
