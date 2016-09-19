@@ -2,7 +2,7 @@
 
 class LayoutView {
 
-  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv, $sessionBefore, $setCookies) {
+  public function render($isLoggedIn, $v, DateTimeView $dtv, $sessionBefore, $setCookies) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -31,4 +31,5 @@ class LayoutView {
       return '<h2>Not logged in</h2>';
     }
   }
+
 }
