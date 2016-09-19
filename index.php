@@ -21,7 +21,7 @@ $setCookies = $v->checkCookies();
 $sessionBefore = $v->getThings();
 
 if (isset($_GET["register"])) {
-  $lv->render($v->isLoggedIn($setCookies), $r, $dtv, $sessionBefore, $setCookies);
+  $lv->render($v->isLoggedIn($setCookies), $r, $dtv, $sessionBefore, $setCookies, true);
 } else {
-  $lv->render($v->isLoggedIn($setCookies), $v, $dtv, $sessionBefore, $setCookies);
+  $lv->render($v->isLoggedIn($setCookies), $v, $dtv, $sessionBefore, $setCookies, false);
 }
