@@ -2,7 +2,7 @@
 
 class LayoutView {
 
-  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv, $sessionBefore) {
+  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv, $sessionBefore, $setCookies) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -14,7 +14,7 @@ class LayoutView {
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
 
           <div class="container">
-              ' . $v->response($sessionBefore) . '
+              ' . $v->response($sessionBefore, $setCookies) . '
 
               ' . $dtv->show() . '
           </div>

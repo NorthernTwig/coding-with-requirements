@@ -9,8 +9,9 @@ class LoginView {
 	private static $cookiePassword = 'LoginView::CookiePassword';
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
-	private static $message = 'LoginView::testing';
-	private static $hasAlreadyLoggedIn = 'LoginView::Test';
+	private static $hasAlreadyLoggedIn = true;
+	private static $hasCookies = "LoginView::Cookies";
+	private static $message = '';
 
 
 	/**
@@ -20,10 +21,7 @@ class LoginView {
 	 *
 	 * @return  void BUT writes to standard output and cookies!
 	 */
-	public function response($sessionBefore) {
-
-		self::$message = "";
-
+	public function response($sessionBefore, $setCookies) {
 		self::$hasAlreadyLoggedIn = $sessionBefore;
 
 		$this->credentialChecker();
@@ -105,6 +103,15 @@ class LoginView {
 		return $loggedBefore;
 	}
 
+	public function checkCookies() {
+		$hasTheRightCookies = false;
+
+		if (isset($_COOKIE["Username"]) && isset($_COOKIE["Password"])) {
+			$hasTheRightCookies = true;
+		}
+		return $hasTheRightCookies;
+	}
+
 	private function checkUsername() {
 		$hasUsername = false;
 
@@ -130,13 +137,13 @@ class LoginView {
 
 	}
 
-	public function isLoggedIn() {
+	public function isLoggedIn($rightCookies) {
 		$status = false;
 
-		if (isset($_COOKIE["Username"]) && isset($_COOKIE["Password"])) {
-			$this->compareDatabase(true);
+		if ($rightCookies) {
+			$this->compareDatabase();
 		} else if (isset($_POST[self::$name]) && isset($_POST[self::$password])) {
-			$this->compareDatabase(false);
+			$this->compareDatabase();
 		}
 
 		if (isset($_SESSION["loggedIn"])) {
@@ -161,9 +168,13 @@ class LoginView {
 		setcookie("Password", NULL, time()-1);
 	}
 
-	public function compareDatabase($isFromCookies) {
+	private function waitForSetting() {
+		return self::$hasAlreadyLoggedIn;
+	}
 
-		if ($isFromCookies) {
+	public function compareDatabase() {
+
+		if (isset($_COOKIE["Username"])) {
 			$username = $_COOKIE["Username"];
 			$password = $_COOKIE["Password"];
 		} else {
@@ -173,22 +184,30 @@ class LoginView {
 
 			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
 
-					if (!self::$hasAlreadyLoggedIn) {
+				// var_dump(!$this->waitForSetting());
 
-						if (isset($_POST[self::$keep]) && $_POST[self::$keep] == "on") {
-							$this->setCookie($username, $password);
-						}
+				if ($this->checkCookies()) {
+					if (!$this->waitForSetting()) {
+						self::$message = "Welcome back with cookie";
+					}
+					$_SESSION["loggedIn"] = true;
+				}
 
-						if ($isFromCookies) {
-							self::$message = "Welcome back with cookie";
-						} else {
-							self::$message = "Welcome";
-						}
+				if (!self::$hasAlreadyLoggedIn && !$this->checkCookies()) {
 
-
+					if (isset($_POST[self::$keep]) && $_POST[self::$keep] == "on") {
+						$this->setCookie($username, $password);
 					}
 
-					$_SESSION["loggedIn"] = true;
+					if (self::$keep) {
+						self::$message = "Welcome and you will be remembered";
+					} else {
+						self::$message = "Welcome";
+					}
+
+				}
+
+				$_SESSION["loggedIn"] = true;
 				} else {
 					self::$message = "Wrong name or password";
 				}
@@ -207,7 +226,7 @@ class LoginView {
 
   		if (isset($_POST[self::$login])) {
           	if ($this->checkUsername() && $this->checkPassword()) {
-            	$this->compareDatabase(false);
+            	$this->compareDatabase();
           	} else if (!$this->checkUsername()) {
             	self::$message = "Username is missing";
           	} else if (!$this->checkPassword()) {

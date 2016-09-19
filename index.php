@@ -15,6 +15,7 @@ $v = new LoginView();
 $dtv = new DateTimeView();
 $lv = new LayoutView();
 
+$setCookies = $v->checkCookies();
 $sessionBefore = $v->getThings();
 
-$lv->render($v->isLoggedIn(), $v, $dtv, $sessionBefore);
+$lv->render($v->isLoggedIn($setCookies), $v, $dtv, $sessionBefore, $setCookies);
