@@ -184,25 +184,16 @@ class LoginView {
 
 			if ($this->superRealDatabase()["username"] == $username && $this->superRealDatabase()["password"] == $password) {
 
-				// var_dump(!$this->waitForSetting());
-
-				if ($this->checkCookies()) {
-					if (!$this->waitForSetting()) {
-						self::$message = "Welcome back with cookie";
-					}
-					$_SESSION["loggedIn"] = true;
-				}
-
-				if (!self::$hasAlreadyLoggedIn && !$this->checkCookies()) {
+				if (!self::$hasAlreadyLoggedIn) {
 
 					if (isset($_POST[self::$keep]) && $_POST[self::$keep] == "on") {
 						$this->setCookie($username, $password);
 					}
 
-
-
-					if (self::$keep == "on") {
+					if (isset($_POST[self::$keep])) {
 						self::$message = "Welcome and you will be remembered";
+					} else if ($this->checkCookies()) {
+						self::$message = "Welcome back with cookie";
 					} else {
 						self::$message = "Welcome";
 					}
@@ -224,10 +215,11 @@ class LoginView {
 							$this->unsetCookie();
 							self::$message = "Bye bye!";
 						}
+						return;
   		}
 
-  		if (isset($_POST[self::$login])) {
-          	if ($this->checkUsername() && $this->checkPassword()) {
+  		if (isset($_POST[self::$login]) || isset($_COOKIE["Username"])) {
+          	if ($this->checkUsername() && $this->checkPassword() || $this->checkCookies()) {
             	$this->compareDatabase();
           	} else if (!$this->checkUsername()) {
             	self::$message = "Username is missing";
