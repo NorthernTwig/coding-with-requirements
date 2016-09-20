@@ -9,7 +9,7 @@ class RegisterView {
 
 	public function response() {
 
-		if (isset($_POST["DoRegistration"])) {
+		if (isset($_POST[self::$name])) {
 			$this->setMessage();
 		}
 
