@@ -27,7 +27,7 @@ class RegisterView {
 							<legend>Register a new user - Write username and password</legend>
 								<p id="' . self::$messageId . '">' . $message . '</p>
 								<label for="' . self::$name . '">Username :</label>
-								<input type="text" size="20" name="' . self::$name . '" id="' . self::$name . '" value="">
+								<input type="text" size="20" name="' . self::$name . '" id="' . self::$name . '" value="' . $this->getUsername() . '">
 								<br>
 								<label for="' . self::$password . '">Password  :</label>
 								<input type="password" size="20" name="' . self::$password . '" id="' . self::$password . '" value="">
@@ -56,6 +56,15 @@ class RegisterView {
 			self::$message .= 'Passwords do not match.';
 		}
 
+	}
+
+	private function getUsername() {
+		$name = "";
+		if (isset($_POST[self::$name])) {
+			$name = $_POST[self::$name];
+		}
+
+		return $name;
 	}
 
 	private function passwordCheck() {
