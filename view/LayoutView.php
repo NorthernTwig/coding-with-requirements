@@ -1,8 +1,16 @@
 <?php
 
+namespace view;
+
+require_once('DateTimeView.php');
+
 class LayoutView {
 
-  public function render($isLoggedIn, $v, DateTimeView $dtv, $sessionBefore, $setCookies, $place) {
+  public function __construct(string $form) {
+    $this->toOutputBuffer($form, $this->getloginMessage());
+  }
+
+  private function toOutputBuffer($form, $loginMessage) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -11,36 +19,55 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          ' . $this->isLoggedOutOrRegistration($place, $isLoggedIn) . '
-          ' . $this->renderIsLoggedIn($isLoggedIn) . '
-
+            <a href="?register">Register a new User</a>
+            <h2>' . $loginMessage . '</h2>
           <div class="container">
-              ' . $v->response($sessionBefore, $setCookies) . '
-
-              ' . $dtv->show() . '
+              ' . $form . '
+              ' . $this->getDate() . '
           </div>
          </body>
       </html>
     ';
   }
 
-  private function renderIsLoggedIn($isLoggedIn) {
-    if ($isLoggedIn) {
-      return '<h2>Logged in</h2>';
-    }
-    else {
-      return '<h2>Not logged in</h2>';
-    }
+  private function getDate() {
+    $date = new DateTimeView();
+    return $date->show();
   }
 
-  private function isLoggedOutOrRegistration($place, $isLoggedIn) {
-    if ($place) {
-      return '<a href="?">Back to login</a>';
-    } else {
-      if (!$isLoggedIn) {
-        return '<a href="?register">Register a new user</a>';
+  private function getLoginMessage() {
+
+    if (isset($_SESSION['loggedIn'])) {
+      if ($_SESSION['loggedIn']) {
+        return 'Logged in';
+      } else {
+        return 'Not logged in';
       }
     }
+
   }
+
+  // private function ()
+  //
+  //
+  // //
+  // // private function renderIsLoggedIn($isLoggedIn) {
+  //   if ($isLoggedIn) {
+  //     return '<h2>Logged in</h2>';
+  //   }
+  //   else {
+  //     return '<h2>Not logged in</h2>';
+  //   }
+  // }
+  //
+  // private function isLoggedOutOrRegistration($place, $isLoggedIn) {
+  //   if ($place) {
+  //     return '<a href="?">Back to login</a>';
+  //   } else {
+  //     if (!$isLoggedIn) {
+  //       return '<a href="?register">Register a new user</a>';
+  //     }
+  //   }
+  // }
 
 }
