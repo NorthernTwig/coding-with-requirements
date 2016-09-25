@@ -9,34 +9,29 @@ require_once("model/SessionModel.php");
 
 class LoginController {
 
-  public function __construct($flashModel) {
-    $this->flashModel = $flashModel;
+  public function __construct($flashModel, $sessionModel) {
     $this->lw = new \view\LoginView();
+    $this->sm = $sessionModel;
+    $this->fm = $flashModel;
 
       try {
         if ($this->lw->isLoggingIn()) {
           $this->username = $this->lw->getUsername();
           $this->password = $this->lw->getPassword();
           $this->compareEnteredCredentials();
-        } else if ($this->lw->isLoggingOut() && $_SESSION['isLoggedIn']) {
+        } else if ($this->lw->isLoggingOut() && $this->sm->getIsLoggedIn()) {
           $_SESSION['isLoggedIn'] = false;
+          $_SESSION['message'] = 'Bye bye!';
         }
       } catch (\Exception $e) {
-        $this->flashModel->setFlashMessage($e->getMessage());
+        $_SESSION['message'] = $e->getMessage();
       } finally {
-        $this->lw->toLayoutView($this->flashModel);
-        if ($_SESSION['isLoggedIn'] && $this->lw->isLoggingIn()) {
+        $this->lw->toLayoutView($this->fm, $this->sm);
+        if ($this->lw->isLoggingIn() || $this->lw->isLoggingOut()) {
           header('Location: /');
           exit();
         }
       }
-
-
-
-  }
-
-  private function login() {
-
   }
 
   private function getExistingUsers() {
@@ -50,7 +45,7 @@ class LoginController {
 
     if ($existingUsers['username'] == $this->username && $existingUsers['password'] == $this->password) {
       $_SESSION['isLoggedIn'] = true;
-      $this->flashModel->setFlashMessage('Welcome');
+      $_SESSION['message'] = 'Welcome';
     }
 
   }

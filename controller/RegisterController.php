@@ -10,17 +10,4 @@ class RegisterController {
     $rv = new \view\RegisterView();
   }
 
-  // private function compareEnteredDetails() {
-  //
-  // }
-
-
-  // Get credentials from View
-  // Compare credentials with Model
-  // Send credentials to view with message
-
-
-
-
-
 }

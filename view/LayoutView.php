@@ -6,8 +6,9 @@ require_once('DateTimeView.php');
 
 class LayoutView {
 
-  public function __construct() {
+  public function __construct($sessionModel) {
     $this->date = new DateTimeView();
+    $this->sessionModel = $sessionModel;
   }
 
   public function toOutputBuffer($formOrLogoutButton) {
@@ -36,7 +37,7 @@ class LayoutView {
   }
 
   private function getLoginMessage() {
-      if ($_SESSION['isLoggedIn']) {
+      if ($this->sessionModel->getIsLoggedIn()) {
         return 'Logged in';
       } else {
         return 'Not logged in';
@@ -44,21 +45,11 @@ class LayoutView {
   }
 
   private function displayRegisterLink() {
-    if ($_SESSION['isLoggedIn']) {
+    if ($this->sessionModel->getIsLoggedIn()) {
       return '';
     } else {
       return '<a href="?register">Register a new User</a>';
     }
   }
-
-  // private function isLoggedOutOrRegistration($place, $isLoggedIn) {
-  //   if ($place) {
-  //     return '<a href="?">Back to login</a>';
-  //   } else {
-  //     if (!$isLoggedIn) {
-  //       return '<a href="?register">Register a new user</a>';
-  //     }
-  //   }
-  // }
 
 }
