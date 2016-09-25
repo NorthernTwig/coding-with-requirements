@@ -6,11 +6,11 @@ require_once('DateTimeView.php');
 
 class LayoutView {
 
-  public function __construct(string $form) {
-    $this->toOutputBuffer($form, $this->getloginMessage());
+  public function __construct() {
+    $this->date = new DateTimeView();
   }
 
-  private function toOutputBuffer($form, $loginMessage) {
+  public function toOutputBuffer($formOrLogoutButton) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -19,47 +19,38 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-            <a href="?register">Register a new User</a>
-            <h2>' . $loginMessage . '</h2>
+            ' . $this->displayRegisterLink() . '
+            <h2>' . $this->getLoginMessage() . '</h2>
           <div class="container">
-              ' . $form . '
+              ' . $formOrLogoutButton . '
               ' . $this->getDate() . '
           </div>
          </body>
       </html>
     ';
+
   }
 
   private function getDate() {
-    $date = new DateTimeView();
-    return $date->show();
+    return $this->date->show();
   }
 
   private function getLoginMessage() {
-
-    if (isset($_SESSION['loggedIn'])) {
-      if ($_SESSION['loggedIn']) {
+      if ($_SESSION['isLoggedIn']) {
         return 'Logged in';
       } else {
         return 'Not logged in';
       }
-    }
-
   }
 
-  // private function ()
-  //
-  //
-  // //
-  // // private function renderIsLoggedIn($isLoggedIn) {
-  //   if ($isLoggedIn) {
-  //     return '<h2>Logged in</h2>';
-  //   }
-  //   else {
-  //     return '<h2>Not logged in</h2>';
-  //   }
-  // }
-  //
+  private function displayRegisterLink() {
+    if ($_SESSION['isLoggedIn']) {
+      return '';
+    } else {
+      return '<a href="?register">Register a new User</a>';
+    }
+  }
+
   // private function isLoggedOutOrRegistration($place, $isLoggedIn) {
   //   if ($place) {
   //     return '<a href="?">Back to login</a>';

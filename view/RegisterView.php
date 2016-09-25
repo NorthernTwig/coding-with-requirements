@@ -51,7 +51,7 @@ class RegisterView {
 	//
 	// 	$response = $this->generateRegisterForm(self::$message);
 	//
-	// 	return $response;
+	// 	return $response;beautif
 	//
 	// }
 
@@ -72,7 +72,7 @@ class RegisterView {
 	//
 	// }
 	//
-	// private function getUsername() {
+	// private function () {
 	// 	$name = "";
 	// 	if (isset($_POST[self::$name])) {
 	// 		$name = $_POST[self::$name];

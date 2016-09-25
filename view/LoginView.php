@@ -3,6 +3,7 @@
 namespace view;
 
 require_once('LayoutView.php');
+require_once('model/FlashModel.php');
 
 class LoginView {
 	private static $login = 'LoginView::Login';
@@ -14,16 +15,31 @@ class LoginView {
 	private static $keep = 'LoginView::KeepMeLoggedIn';
 	private static $messageId = 'LoginView::Message';
 
-	public function toLayoutView() {
-		$lv = new LayoutView($this->generateLoginForm());
+	public function toLayoutView(\model\FlashModel $flashModel) {
+		$lv = new LayoutView();
+
+		$this->flashModel = $flashModel;
+
+		var_dump($this->flashModel->getFlashMessage());
+
+		$flashMessage = $this->flashModel->getFlashMessage();
+
+		if ($_SESSION['isLoggedIn']) {
+			$lv->toOutputBuffer($this->generateLogoutButtonHTML($flashMessage));
+		} else {
+			$lv->toOutputBuffer($this->generateLoginForm($flashMessage));
+		}
+
+		// $this->flashModel->removeFlashMessage();
+
 	}
 
-	private function generateLoginForm() {
+	private function generateLoginForm($message) {
 			return '
 				<form method="post">
 					<fieldset>
 						<legend>Login - enter Username and password</legend>
-						<p id="' . self::$messageId . '">Message Here</p>
+						<p id="' . self::$messageId . '"> ' . $message . '</p>
 
 						<label for="' . self::$name . '">Username :</label>
 						<input type="text" id="' . self::$name . '" name="' . self::$name . '" value="Username Here" />
@@ -41,6 +57,7 @@ class LoginView {
 	}
 
 	private function generateLogoutButtonHTML($message) {
+
 		return '
 			<form  method="post" >
 				<p id="' . self::$messageId . '">' . $message .'</p>
@@ -50,15 +67,25 @@ class LoginView {
 	}
 
 	public function getUsername() {
+		if (strlen($_POST[self::$name]) == 0) {
+			throw new \Exception('Username is missing.');
+		}
 		return $_POST[self::$name];
 	}
 
 	public function getPassword() {
+		if (strlen($_POST[self::$password]) == 0) {
+			throw new \Exception('Password is missing.');
+		}
 		return $_POST[self::$password];
 	}
 
 	public function isLoggingIn() {
 		return isset($_POST[self::$login]);
+	}
+
+	public function isLoggingOut() {
+		return isset($_POST[self::$logout]);
 	}
 
 	// private static $hasAlreadyLoggedIn = true;
