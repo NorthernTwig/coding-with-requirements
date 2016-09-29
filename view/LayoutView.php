@@ -1,8 +1,17 @@
 <?php
 
+namespace view;
+
+require_once('DateTimeView.php');
+
 class LayoutView {
 
-  public function render($isLoggedIn, $v, DateTimeView $dtv, $sessionBefore, $setCookies, $place) {
+  public function __construct($sessionModel) {
+    $this->date = new DateTimeView();
+    $this->sessionModel = $sessionModel;
+  }
+
+  public function toOutputBuffer($formOrLogoutButton) {
     echo '<!DOCTYPE html>
       <html>
         <head>
@@ -11,33 +20,37 @@ class LayoutView {
         </head>
         <body>
           <h1>Assignment 2</h1>
-          ' . $this->isLoggedOutOrRegistration($place, $isLoggedIn) . '
-          ' . $this->renderIsLoggedIn($isLoggedIn) . '
-
+            ' . $this->displayRegisterLink() . '
+            <h2>' . $this->getLoginMessage() . '</h2>
           <div class="container">
-              ' . $v->response($sessionBefore, $setCookies) . '
-
-              ' . $dtv->show() . '
+              ' . $formOrLogoutButton . '
+              ' . $this->getDate() . '
           </div>
          </body>
       </html>
     ';
+
   }
 
-  private function renderIsLoggedIn($isLoggedIn) {
-    if ($isLoggedIn) {
-      return '<h2>Logged in</h2>';
-    }
-    else {
-      return '<h2>Not logged in</h2>';
-    }
+  private function getDate() {
+    return $this->date->show();
   }
 
-  private function isLoggedOutOrRegistration($place, $isLoggedIn) {
-    if ($place) {
-      return '<a href="?">Back to login</a>';
+  private function getLoginMessage() {
+      if ($this->sessionModel->getIsLoggedIn()) {
+        return 'Logged in';
+      } else {
+        return 'Not logged in';
+      }
+  }
+
+  private function displayRegisterLink() {
+    if ($this->sessionModel->getIsLoggedIn()) {
+      return '';
     } else {
-      if (!$isLoggedIn) {
+      if (isset($_GET['register'])) {
+        return '<a href="/">Back to login</a>';
+      } else {
         return '<a href="?register">Register a new user</a>';
       }
     }

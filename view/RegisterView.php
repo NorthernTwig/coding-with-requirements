@@ -1,5 +1,9 @@
 <?php
 
+namespace view;
+
+require_once('LayoutView.php');
+
 class RegisterView {
 	private static $messageId = 'RegisterView::Message';
 	private static $name = 'RegisterView::UserName';
@@ -7,97 +11,83 @@ class RegisterView {
 	private static $passwordRepeat = 'RegisterView::PasswordRepeat';
 	private static $message = '';
 
-	public function response() {
-
-		if (isset($_POST[self::$name])) {
-			$this->setMessage();
+	public function __construct() {
+		if (!isset($_SESSION['username'])) {
+			$_SESSION['username'] = '';
 		}
-
-		$response = $this->generateRegisterForm(self::$message);
-
-		return $response;
-
 	}
 
-	private function generateRegisterForm($message) {
+	public function registerToLayoutView($flashModel, $sessionModel) {
+		$rv = new LayoutView($sessionModel);
+		$rv->toOutputBuffer($this->generateRegisterForm());
+	}
+
+	private function generateRegisterForm() {
 		return '
-					<h2>Register new user</h2>
-					<form action="?register" method="post" enctype="multipart/form-data">
-							<fieldset>
-							<legend>Register a new user - Write username and password</legend>
-								<p id="' . self::$messageId . '">' . $message . '</p>
-								<label for="' . self::$name . '">Username :</label>
-								<input type="text" size="20" name="' . self::$name . '" id="' . self::$name . '" value="' . $this->getUsername() . '">
-								<br>
-								<label for="' . self::$password . '">Password  :</label>
-								<input type="password" size="20" name="' . self::$password . '" id="' . self::$password . '" value="">
-								<br>
-								<label for="' . self::$passwordRepeat . '">Repeat password  :</label>
-								<input type="password" size="20" name="' . self::$passwordRepeat . '" id="' . self::$passwordRepeat . '" value="">
-								<br>
-								<input id="submit" type="submit" name="DoRegistration" value="Register">
-								<br>
-							</fieldset>
-						</form>';
+		<h2>Register new user</h2>
+		<form action="?register" method="post" enctype="multipart/form-data">
+		<fieldset>
+		<legend>Register a new user - Write username and password</legend>
+		<p id="' . self::$messageId . '">' . $this->getMessage() . '</p>
+		<label for="' . self::$name . '">Username :</label>
+		<input type="text" size="20" name="' . self::$name . '" id="' . self::$name . '" value="' . $_SESSION['username'] . '">
+		<br>
+		<label for="' . self::$password . '">Password  :</label>
+		<input type="password" size="20" name="' . self::$password . '" id="' . self::$password . '" value="">
+		<br>
+		<label for="' . self::$passwordRepeat . '">Repeat password  :</label>
+		<input type="password" size="20" name="' . self::$passwordRepeat . '" id="' . self::$passwordRepeat . '" value="">
+		<br>
+		<input id="submit" type="submit" name="DoRegistration" value="Register">
+		<br>
+		</fieldset>
+		</form>';
 	}
 
-	private function setMessage() {
+	private function getMessage() {
+		return self::$message;
+	}
 
-		if (!$this->usernameCheck()) {
-			self::$message = 'Username has too few characters, at least 3 characters.<br>';
-		}
+	private function cleanUpUsername($username) {
+		$cleanedUsername = strip_tags($username);
+		return $cleanedUsername;
+	}
 
+	private function checkForInvalidCharacters() {
+		preg_match('/^[a-zA-Z0-9]+$/', $_POST[self::$name], $matches);
+		$_SESSION['username'] = $this->cleanUpUsername($_POST[self::$name]);
 
-		if (!$this->passwordCheck()) {
-			self::$message .= 'Password has too few characters, at least 6 characters.<br>';
-		}
-
-		if (!$this->passwordMatch()) {
-			self::$message .= 'Passwords do not match.';
-		}
+		return $matches > 0;
 
 	}
 
-	private function getUsername() {
-		$name = "";
+	public function checkRegisterUsername() {
 		if (isset($_POST[self::$name])) {
-			$name = $_POST[self::$name];
+			if (strlen($_POST[self::$name]) < 3) {
+				self::$message .= 'Username has too few characters, at least 3 characters.<br>';
+				$_SESSION['username'] = $_POST[self::$name];
+			} else if ($this->checkForInvalidCharacters()) {
+				self::$message .= 'Username contains invalid characters.<br>';
+			}
 		}
-
-		return $name;
 	}
 
-	private function passwordCheck() {
-		$validPassword = false;
+	public function checkRegisterPassword() {
 		if (isset($_POST[self::$password])) {
-			if (strlen($_POST[self::$password]) >= 6) {
-				$validPassword = true;
+
+			if (strlen($_POST[self::$password]) < 6) {
+				self::$message .= 'Password has too few characters, at least 6 characters.<br>';
 			}
+
 		}
-		return $validPassword;
 	}
 
-	private function usernameCheck() {
-		$validUsername = false;
-
-		if (isset($_POST[self::$name])) {
-			if (strlen($_POST[self::$name]) >= 3) {
-				$validUsername = true;
-			}
-		}
-
-		return $validUsername;
-	}
-
-	private function passwordMatch() {
-		$matching = false;
+	public function passwordsMatch() {
 		if (isset($_POST[self::$password]) && isset($_POST[self::$passwordRepeat])) {
-			if ($_POST[self::$password] == $_POST[self::$passwordRepeat]) {
-				$matching = true;
+			if ($_POST[self::$password] !== $_POST[self::$passwordRepeat]) {
+				self::$message .= 'Passwords do not match.';
 			}
 		}
-		return $matching;
 	}
-
 
 }
